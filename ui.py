@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 from textblob import TextBlob
 import textwrap
 import google.generativeai as genai
-
+import time
 from IPython.display import display
 from IPython.display import Markdown
 
@@ -194,11 +194,16 @@ def fetch_news_sentiment(stock_symbol):
         # Calculate average sentiment score
         if sentiment_scores:
             average_score = sum(sentiment_scores) / len(sentiment_scores)
+            with st.spinner(text='In progress'):
+                time.sleep(3)
+                st.success('Done')
             st.subheader("Overall Sentiment Analysis:")
             st.write(f"Average Sentiment Score: {average_score:.2f}")
             if average_score > 0:
+                st.balloons()
                 st.success("Recommendation: Buy")
             elif average_score < 0:
+                st.snow()
                 st.error("Recommendation: Sell")
             else:
                 st.info("Recommendation: Hold")
@@ -213,7 +218,7 @@ def get_gemini_summary(link):
 
 # Streamlit app
 def main():
-    st.set_page_config(page_title="ArthaGyani",
+    st.set_page_config(page_title="WealthWise",
                        page_icon='💸',
                        layout='centered')
     st.title('Stock Price Prediction, Algorithmic Trading Signals, and Sentiment Analysis using AI')
@@ -251,6 +256,9 @@ def main():
         input_date_str = st.date_input('Select Date')
         if st.button('Predict Price'):
             # Fetch historical stock data
+            bar = st.progress(50)
+            time.sleep(3)
+            bar.progress(100)
             start_date = '2010-01-01'
             end_date = datetime.strftime(input_date_str, '%Y-%m-%d')
             stock_data = fetch_stock_data(stock_name, start_date, end_date)['Close']
@@ -272,7 +280,7 @@ def main():
                 predicted_price_scaled = lstm_model.predict(X)
                 predicted_price = scaler.inverse_transform(predicted_price_scaled)[-1][0]
 
-                st.write(f"Predicted price for {input_date_str}: ₹{predicted_price:.2f}")
+                st.success(f"Predicted price for {input_date_str}: ₹{predicted_price:.2f}")
 
             # Plot actual prices
                 plt.figure(figsize=(10, 6))
